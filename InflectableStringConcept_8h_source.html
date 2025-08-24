@@ -90,18 +90,21 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;inflection/dialog/SpeakableString.h&gt;</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;inflection/dialog/SemanticFeatureConcept.h&gt;</span></div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;inflection/dialog/SemanticFeatureModel.h&gt;</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;inflection/dialog/SemanticFeature.hpp&gt;</span></div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>INFLECTION_CTYPE(IDInflectableStringConcept)</div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>INFLECTION_CAPI IDSemanticFeatureConcept* iinf_toSemanticFeatureConcept(IDInflectableStringConcept* thisObject, UErrorCode* status);</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>INFLECTION_CAPI IDInflectableStringConcept* iinf_toInflectableStringConcept(IDSemanticFeatureConcept* thisObject, UErrorCode* status);</div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>INFLECTION_CAPI IDInflectableStringConcept* iinf_create(<span class="keyword">const</span> IDSemanticFeatureModel* model, <span class="keyword">const</span> IDSpeakableString* value, UErrorCode* status);</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>INFLECTION_CAPI <span class="keywordtype">void</span> iinf_destroy(IDInflectableStringConcept* thisObject);</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>INFLECTION_CAPI IDInflectableStringConcept* iinf_createWithConstraints(<span class="keyword">const</span> IDSemanticFeatureModel* model, <span class="keyword">const</span> IDSpeakableString* value, </div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>                                                                       <span class="keyword">const</span> <a class="code hl_class" href="classinflection_1_1dialog_1_1SemanticFeature.html">inflection::dialog::SemanticFeature</a>* features, <span class="keyword">const</span> <span class="keywordtype">char16_t</span>** values, int32_t SemanticFeaturesLen, UErrorCode* status);</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>INFLECTION_CAPI <span class="keywordtype">void</span> iinf_destroy(IDInflectableStringConcept* thisObject);</div>
+<div class="ttc" id="aclassinflection_1_1dialog_1_1SemanticFeature_html"><div class="ttname"><a href="classinflection_1_1dialog_1_1SemanticFeature.html">inflection::dialog::SemanticFeature</a></div><div class="ttdoc">Represents a single semantic feature.</div><div class="ttdef"><b>Definition</b> <a href="SemanticFeature_8hpp_source.html#l00014">SemanticFeature.hpp:16</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Aug 24 2025 05:18:17 for Inflection by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8
+Generated on Sun Aug 24 2025 11:40:35 for Inflection by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8
 </small></address>
 </body>
 </html>
