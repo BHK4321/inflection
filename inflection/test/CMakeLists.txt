@@ -8,7 +8,7 @@ target_link_libraries(itest
         PRIVATE
             inflection
             Catch2
-            xml2
+            LibXml2::LibXml2
             marisa_objs
             ICU::uc ICU::i18n
             $<$<PLATFORM_ID:Darwin>:${PERFDATA_FRAMEWORK}>

@@ -88,9 +88,7 @@ file(MAKE_DIRECTORY ${INFLECTION_INCLUDE_ROOT})
 
 include(dependICU)
 
-add_library(xml2 INTERFACE IMPORTED GLOBAL)
-set_target_properties(xml2 PROPERTIES IMPORTED_LIBNAME xml2)
-target_include_directories(xml2 INTERFACE ${CMAKE_OSX_SYSROOT}/usr/include/libxml2)
+find_package(LibXml2 REQUIRED)
 
 # Runs Unicode Inflection unit tests: "make check"
 set(DYLD_LIBRARY_PATH ${ICU_LIB_DIRECTORY}:$<TARGET_FILE_DIR:inflection>)
