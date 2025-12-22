@@ -5,6 +5,7 @@
 
 #include <inflection/dialog/InflectableStringConcept.hpp>
 #include <inflection/dialog/SemanticFeatureModel.hpp>
+#include <inflection/dialog/SemanticFeature.hpp>
 #include <inflection/dialog/SpeakableString.hpp>
 #include <inflection/dialog/LocalizedCommonConceptFactoryProvider.hpp>
 #include <inflection/exception/XMLParseException.hpp>
@@ -35,9 +36,26 @@ static std::string getInfoStringForTestInput(const ::inflection::dialog::Semanti
     return "locale=" + model.getLocale().getName() + (source.isEmpty() ? "" : std::string(" source=") + inflection::util::StringUtils::to_string(source.toString())) + " {" + constraintsStr + "}";
 }
 
-static void compareInflection(const ::inflection::dialog::SemanticFeatureModel& model, const ::inflection::dialog::SpeakableString& expected, const ::inflection::dialog::SpeakableString& source, const std::map<std::u16string, std::u16string>& constraints, const std::map<std::u16string, std::u16string>& resultAttributes)
+static void compareInflection(const ::inflection::dialog::SemanticFeatureModel& model,
+                              const ::inflection::dialog::SpeakableString& expected,
+                              const ::inflection::dialog::SpeakableString& source,
+                              const std::map<std::u16string, std::u16string>& constraints,
+                              const std::map<std::u16string, std::u16string>& resultAttributes,
+                              const std::map<std::u16string, std::u16string>& initialAttributes)
 {
-    inflection::dialog::InflectableStringConcept inflectableConcept(&model, source);
+    std::map<inflection::dialog::SemanticFeature, ::std::u16string> intitialConstraints;
+    for(const auto& [attrKey, attrVal] : initialAttributes) {
+        auto featureName = model.getFeature(attrKey);
+        if (featureName == nullptr) {
+            FAIL_CHECK(model.getLocale().getName() + std::string(": feature name is not recognized: ") + inflection::util::StringUtils::to_string(attrKey));
+        }
+        const auto& boundedValues(npc(featureName)->getBoundedValues());
+        if (!boundedValues.empty() && boundedValues.find(attrVal) == boundedValues.end()) {
+            FAIL_CHECK(model.getLocale().getName() + std::string(": feature value \"") + inflection::util::StringUtils::to_string(attrVal) + "\" is not valid for feature \"" + inflection::util::StringUtils::to_string(attrKey) + "\"");
+        }
+        intitialConstraints[*featureName] = attrVal;
+    }
+    inflection::dialog::InflectableStringConcept inflectableConcept(&model, source, intitialConstraints);
     for (const auto& constraint : constraints) {
         auto featureName = model.getFeature(constraint.first);
         if (featureName == nullptr) {
@@ -171,16 +189,26 @@ TEST_CASE("InflectionTest#testInflections")
             if (xmlStrEqual(sourceNode->name, (const xmlChar *) "source") == 0) {
                 throw ::inflection::exception::XMLParseException(u"Expecting element <source>, got <" + ::inflection::util::StringUtils::to_u16string(std::string(reinterpret_cast<const char*>(sourceNode->name))) + u">");
             }
-            xmlNodePtr resultNode = xmlNextElementSibling(sourceNode);
-            if (xmlStrEqual(resultNode->name, (const xmlChar *) "result") == 0) {
-                throw ::inflection::exception::XMLParseException(u"Expecting element <result>, got <" + ::inflection::util::StringUtils::to_u16string(std::string(reinterpret_cast<const char*>(resultNode->name))) + u">");
+
+            // optional initial child tag
+            curTestChild = xmlNextElementSibling(sourceNode);
+            xmlNodePtr initialNode = nullptr;
+            if(xmlStrEqual(curTestChild->name, (const xmlChar*) "initial") != 0) {
+                initialNode = curTestChild;
+                curTestChild = xmlNextElementSibling(curTestChild);
             }
+
+            if (xmlStrEqual(curTestChild->name, (const xmlChar *) "result") == 0) {
+                throw ::inflection::exception::XMLParseException(u"Expecting element <result>, got <" + ::inflection::util::StringUtils::to_u16string(std::string(reinterpret_cast<const char*>(curTestChild->name))) + u">");
+            }
+            xmlNodePtr resultNode = curTestChild;
             auto sourceConstraints(XMLUtils::getAttributes(sourceNode));
             auto resultAttributes(XMLUtils::getAttributes(resultNode));
+            auto initialAttributes(XMLUtils::getAttributes(initialNode));
             auto sourceString(getSpeakableString(sourceNode));
             auto resultString(getSpeakableString(resultNode));
 
-            compareInflection(*npc(model), resultString, sourceString, sourceConstraints, resultAttributes);
+            compareInflection(*npc(model), resultString, sourceString, sourceConstraints, resultAttributes, initialAttributes);
             numTests++;
         }
         xmlFreeDoc(xmlDoc);

@@ -11,6 +11,9 @@
 #include <inflection/npc.hpp>
 
 std::map<std::u16string, std::u16string> XMLUtils::getAttributes(xmlNodePtr node) {
+    if(node == nullptr) {
+        return { }; 
+    }
     xmlAttr* attribute = node->properties;
     std::map<std::u16string, std::u16string> result;
     while (attribute) {

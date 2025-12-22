@@ -11,7 +11,7 @@
 #include <inflection/util/ULocale.hpp>
 #include <inflection/util/DelimitedStringIterator.hpp>
 #include "util/StringContainer.hpp"
-
+#include <utility>
 using ::util::StringContainer;
 
 static void checkForFailure(UErrorCode* status)
@@ -152,6 +152,73 @@ TEST_CASE("InflectableStringConceptTest-c#testExistsAPISpanish")
     semanticFeatureConcept = iinf_toSemanticFeatureConcept(inflectableConcept, &error);
     REQUIRE_FALSE(isfc_isExists(semanticFeatureConcept, &error));
     REQUIRE(U_SUCCESS(error));
+    iinf_destroy(inflectableConcept);
+}
+
+TEST_CASE("InflectableStringConceptTest-c#testCreateWithDefaults")
+{
+    auto error = U_ZERO_ERROR;
+    auto ccfp = ilccfp_getDefaultCommonConceptFactoryProvider(&error);
+    REQUIRE(U_SUCCESS(error));
+
+    const auto locale = ::inflection::util::LocaleUtils::SPANISH().getName().c_str();
+    auto ccf = ilccfp_getCommonConceptFactory(ccfp, locale, &error);
+    REQUIRE(U_SUCCESS(error));
+
+    auto model = iccf_getSemanticFeatureModel(ccf, &error);
+    REQUIRE(U_SUCCESS(error));
+
+    const std::u16string source = u"cometa";
+    auto sourceString = iss_create(source.c_str(), static_cast<int32_t>(source.size()), &error);
+    REQUIRE(U_SUCCESS(error));
+
+    IDDisplayValue_Constraint defaultConstraints[] = {
+        {u"gender", u"masculine"},
+    };
+
+    auto inflectableConcept = iinf_createWithDefaults(model,
+                                                      sourceString,
+                                                      defaultConstraints,
+                                                      static_cast<int32_t>(std::ssize(defaultConstraints)),
+                                                      &error);
+    iss_destroy(sourceString);
+    REQUIRE(U_SUCCESS(error));
+    REQUIRE(inflectableConcept != nullptr);
+
+    auto semanticConcept = iinf_toSemanticFeatureConcept(inflectableConcept, &error);
+    REQUIRE(U_SUCCESS(error));
+
+    isfc_putConstraintByName(semanticConcept, u"definiteness", u"definite", -1, &error);
+    REQUIRE(U_SUCCESS(error));
+
+    auto printedValue = isfc_toSpeakableStringCopy(semanticConcept, &error);
+    REQUIRE(U_SUCCESS(error));
+    util::StringContainer<IDSpeakableString, iss_getPrint> printedContainer(printedValue);
+    REQUIRE(printedContainer);
+    CHECK(printedContainer.value == u"el cometa");
+    iss_destroy(printedValue);
+
+    auto genderValue = isfc_createFeatureValueByNameCopy(semanticConcept, u"gender", &error);
+    REQUIRE(U_SUCCESS(error));
+    util::StringContainer<IDSpeakableString, iss_getPrint> genderContainer(genderValue);
+    REQUIRE(genderContainer);
+    CHECK(genderContainer.value == u"masculine");
+    iss_destroy(genderValue);
+
+    auto numberValue = isfc_createFeatureValueByNameCopy(semanticConcept, u"number", &error);
+    REQUIRE(U_SUCCESS(error));
+    util::StringContainer<IDSpeakableString, iss_getPrint> numberContainer(numberValue);
+    REQUIRE(numberContainer);
+    CHECK(numberContainer.value == u"singular");
+    iss_destroy(numberValue);
+
+    auto definitenessValue = isfc_createFeatureValueByNameCopy(semanticConcept, u"definiteness", &error);
+    REQUIRE(U_SUCCESS(error));
+    util::StringContainer<IDSpeakableString, iss_getPrint> definitenessContainer(definitenessValue);
+    REQUIRE(definitenessContainer);
+    CHECK(definitenessContainer.value == u"definite");
+    iss_destroy(definitenessValue);
+
     iinf_destroy(inflectableConcept);
 }
 

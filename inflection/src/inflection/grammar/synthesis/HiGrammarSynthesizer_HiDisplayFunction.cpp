@@ -185,7 +185,7 @@ namespace {
 
 ::std::optional<::std::vector<::std::u16string>> HiGrammarSynthesizer_HiDisplayFunction::inflectSignificantWords(const std::vector<::std::u16string> &words, const ::std::map<SemanticFeature, ::std::u16string> &constraints, bool enableInflectionGuess) const {
     if (words.empty()) {
-        return {{}};
+        return std::vector<std::u16string>{};
     }
     const auto &dictionary = dictionaryInflector.getDictionary();
     int64_t adpositionIndex = -1;

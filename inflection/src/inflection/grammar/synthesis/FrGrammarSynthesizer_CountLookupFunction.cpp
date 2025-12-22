@@ -67,7 +67,7 @@ bool FrGrammarSynthesizer_CountLookupFunction::checkInvariantNouns(::std::u16str
     int64_t wordGrammemes = 0;
     dictionary.getCombinedBinaryType(&wordGrammemes, word);
     if ((wordGrammemes & properNounProperty) == properNounProperty) {
-        return {{}};
+        return std::u16string{};
     }
     if (checkInvariantNouns(word, wordGrammemes)) {
         return GrammemeConstants::NUMBER_SINGULAR();

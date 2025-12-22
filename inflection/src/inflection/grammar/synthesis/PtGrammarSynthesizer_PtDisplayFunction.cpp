@@ -195,7 +195,7 @@ PtGrammarSynthesizer_PtDisplayFunction::~PtGrammarSynthesizer_PtDisplayFunction(
 
 ::std::optional<::std::vector<::std::u16string>> PtGrammarSynthesizer_PtDisplayFunction::inflectSignificantWords(const std::vector<::std::u16string> &words, const ::std::map<::inflection::dialog::SemanticFeature, ::std::u16string> &constraints, bool enableInflectionGuess) const {
     switch (words.size()) {
-        case 0: return {{}};
+        case 0: return std::vector<std::u16string>{};
         case 1: {
             int64_t wordType = 0;
             dictionary.getCombinedBinaryType(&wordType, words[0]);
